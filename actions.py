@@ -48,7 +48,6 @@ def oranges_produce():
                 except KeyError:
                     if i['name'] == "Plantation":
                         bid=i['id']
-                        i["busy"] = "yes"
                         core.produce(session,headers,bid,constants.ORANGES,amount)
 
 
@@ -67,7 +66,6 @@ def oranges_sell():
             except KeyError:
                 if i['name'] == "Grocery Store":
                     bid=i['id']
-                    i["busy"] = "yes"
                     core.sell(session,headers,bid,constants.ORANGES,amount,price)
 
 def processor_produce():
@@ -98,5 +96,4 @@ def processor_produce():
             except KeyError:
                 if i['name'] == "Electronics factory":
                     bid=i['id']
-                    i["busy"] = "yes"
                     core.produce(session,headers,bid,constants.PROCESSORS,amount)
