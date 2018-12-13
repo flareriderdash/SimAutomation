@@ -145,7 +145,7 @@ def produce(session,headers,bid, resource,quantity):
         return -1
     return 0
 def sell(session,headers,bid,resource,quantity,price):
-    logger(DEBUG,"Selling: " + str(resouce) + " at quantity " + str(quantity) + " at building " +str(bid))
+    logger(DEBUG,"Selling: " + str(resource) + " at quantity " + str(quantity) + " at building " +str(bid))
     page=session.get("https://www.simcompanies.com/b/"+str(bid)+"/",headers=headers).text
     for i in page.splitlines():
         if "csrf" in i and "input" not in i:
