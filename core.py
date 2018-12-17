@@ -79,7 +79,7 @@ def take_unfinished(buildingid):
 def get_resource(session, headers, rid):
     if logger_ != None:
         logger(DEBUG,"Fetching prices for id: " + str(rid))
-        json_data = session.get("https://www.simcompanies.com/api/market/"+str(rid)).json()
+        json_data = session.get("https://www.simcompanies.com/api/market/"+str(rid))
         cookie_fix(session,headers)
     return json_data
 
@@ -126,6 +126,21 @@ def calculate_price(json_market_list,quantity,rid):
         
     return price
 
+def take_average(session,headers,rid):
+    resource=rid
+    data=get_resource(session,headers,resource)
+    sum_=0
+    sumq=0
+    for i in range(0,11):
+       sum_+=data[i]['price']
+       sumq+=data[i]['quantity']
+
+    total=sum_/10
+    totalq=sumq/10
+    return total,totalq
+
+
+
 def produce(session,headers,bid, resource,quantity):
     logger(DEBUG,"producing: "+str(resource)+" at quantity " + str(quantity) + " at building "+str(bid))
     page=session.get("https://www.simcompanies.com/b/"+str(bid)+"/",headers=headers).text
@@ -158,6 +173,46 @@ def sell(session,headers,bid,resource,quantity,price):
         session.post("https://www.simcompanies.com/sales-order/"+str(bid)+"/",headers=tmp,data=data_)
         cookie_fix(session,headers)
     return 0
+def sell_market(session,headers,rid,price,qunatity): #THSI RID IS PRODUCED RANDOMLY CONSULT THE GET_WAREHOUSE DATA
+    logger(DEBUG,"Selling to market resource " +str(rid) + " at price " + str(price) + " at quantity " +quantity) 
+    page = session.get("https://www.simcompanies.com/warehouse/",headers=headers).text
+    for i in page.splitlines():
+        if "csrf" in i and "input" not in i:
+            csrfmiddlewaretoken=i.split("'")[3]
+            break # prevents setting again
+    if csrfmiddlewaretoken != "":
+        data_=dict(csrfmiddlewaretoken=csrfmiddlewaretoken,resourceId=rid,quantity=quantity,price=price)
+        tmp = headers
+        tmp["Content-Type"]="application/x-www-form-urlencoded"
+        session.post("https://www.simcompanies.com/api/v2/market-order/",headers=tmp,data=data_)
+        cookie_fix(session,headers)
+
+def sell_contract(session,headers,rid,price,quantity,contractTo): #THSI RID IS PRODUCED RANDOMLY CONSULT THE GET_WAREHOUSE DATA
+    logger(DEBUG,"Selling to contract resource " +str(rid) + " at price " + 
+            str(price) + " at quantity " +quantity + " to " +contractTo) 
+    page = session.get("https://www.simcompanies.com/warehouse/",headers=headers).text
+    for i in page.splitlines():
+        if "csrf" in i and "input" not in i:
+            csrfmiddlewaretoken=i.split("'")[3]
+            break # prevents setting again
+    if csrfmiddlewaretoken != "":
+        data_=dict(csrfmiddlewaretoken=csrfmiddlewaretoken,resourceId=rid,quantity=quantity,
+                price=price,contractTo=contractTo.replace(" ","+")) # Be SURE TO CHECK THE PROPER CAPILIZATION
+                                                                    # YOU DO THIS BY CHECKING CONTARCTS WHEN 
+                                                                    # ENTERING THE COMPANY NAME
+        tmp = headers
+        tmp["Content-Type"]="application/x-www-form-urlencoded"
+        session.post("https://www.simcompanies.com/api/v2/market-order/",headers=tmp,data=data_)
+        cookie_fix(session,headers)
+
+
+def get_warehouse(session,headers):
+    logger(DEBUG,"Fetching resources at warehouse")
+    # To View the json data reference 
+    # just print it in a console or something
+    json_data = session.get("https://www.simcompanies.com/api/resource",headers=headers).json()
+    cookie_fix(session,headers)
+    return json_data
 
 ############################TODO#################################
 def op_sheet(path,context):
