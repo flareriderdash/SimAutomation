@@ -79,7 +79,7 @@ def take_unfinished(buildingid):
 def get_resource(session, headers, rid):
     if logger_ != None:
         logger(DEBUG,"Fetching prices for id: " + str(rid))
-        json_data = session.get("https://www.simcompanies.com/api/market/"+str(rid))
+        json_data = session.get("https://www.simcompanies.com/api/market/"+str(rid)).json()
         cookie_fix(session,headers)
     return json_data
 
