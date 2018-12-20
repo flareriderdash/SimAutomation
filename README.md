@@ -18,3 +18,6 @@ Dont worry if you dont see this on the first run.
 
 - In **function.config** you will see a automatically collected user
 function list (if there are defined functions)
+
+- This project uses a modified schedule.py (original code by dbader) that allows
+for a start delay on interval based routines
